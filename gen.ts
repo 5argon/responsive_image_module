@@ -172,7 +172,7 @@ function fileContent(
     })
     .join('\n')
   const objExports = ivs.map<string>((x) => {
-    return `  { moduleFilePath:'${x.physicalPath}', 
+    return `  { physicalPath:'${x.physicalPath}', 
     url: ${x.identifier}, identifier: '${x.identifier}', 
     artDirectionLabel: '${x.artDirectionLabel}', widthDescriptor: ${x.widthDescriptor}, pixelDensity: ${x.pixelDensity}, extension: '${x.extension}'}`
   })

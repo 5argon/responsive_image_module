@@ -26,7 +26,7 @@ Required permissions are `--allow-read --allow-write --unstable`. If you use `de
 deno install --allow-read --allow-write --unstable https://deno.land/x/responsive_image_module/cli.ts
 ```
 
-then you could :
+Then you could :
 
 ```
 responsive_image_module generate [PATH TO INPUT FOLDER]
@@ -83,7 +83,7 @@ import button_128Webp from '../images/button@128w.webp'
 
 const button: ResponsiveImage = [
   {
-    moduleFilePath: 'images/button@16w.png',
+    physicalPath: 'images/button@16w.png',
     url: button_16Png,
     identifier: 'button_16Png',
     artDirectionLabel: '',
@@ -92,7 +92,7 @@ const button: ResponsiveImage = [
     extension: 'png',
   },
   {
-    moduleFilePath: 'images/button@64w.png',
+    physicalPath: 'images/button@64w.png',
     url: button_64Png,
     identifier: 'button_64Png',
     artDirectionLabel: '',
@@ -101,7 +101,7 @@ const button: ResponsiveImage = [
     extension: 'png',
   },
   {
-    moduleFilePath: 'images/button@128w.png',
+    physicalPath: 'images/button@128w.png',
     url: button_128Png,
     identifier: 'button_128Png',
     artDirectionLabel: '',
@@ -110,7 +110,7 @@ const button: ResponsiveImage = [
     extension: 'png',
   },
   {
-    moduleFilePath: 'images/button@16w.webp',
+    physicalPath: 'images/button@16w.webp',
     url: button_16Webp,
     identifier: 'button_16Webp',
     artDirectionLabel: '',
@@ -119,7 +119,7 @@ const button: ResponsiveImage = [
     extension: 'webp',
   },
   {
-    moduleFilePath: 'images/button@64w.webp',
+    physicalPath: 'images/button@64w.webp',
     url: button_64Webp,
     identifier: 'button_64Webp',
     artDirectionLabel: '',
@@ -128,7 +128,7 @@ const button: ResponsiveImage = [
     extension: 'webp',
   },
   {
-    moduleFilePath: 'images/button@128w.webp',
+    physicalPath: 'images/button@128w.webp',
     url: button_128Webp,
     identifier: 'button_128Webp',
     artDirectionLabel: '',
@@ -155,7 +155,7 @@ import innerButtonInner_128Webp from '../../images/inner/buttonInner@128w.webp'
 
 const innerButtonInner: ResponsiveImage = [
   {
-    moduleFilePath: 'images/inner/buttonInner@16w.png',
+    physicalPath: 'images/inner/buttonInner@16w.png',
     url: innerButtonInner_16Png,
     identifier: 'innerButtonInner_16Png',
     artDirectionLabel: '',
@@ -164,7 +164,7 @@ const innerButtonInner: ResponsiveImage = [
     extension: 'png',
   },
   {
-    moduleFilePath: 'images/inner/buttonInner@64w.png',
+    physicalPath: 'images/inner/buttonInner@64w.png',
     url: innerButtonInner_64Png,
     identifier: 'innerButtonInner_64Png',
     artDirectionLabel: '',
@@ -173,7 +173,7 @@ const innerButtonInner: ResponsiveImage = [
     extension: 'png',
   },
   {
-    moduleFilePath: 'images/inner/buttonInner@128w.png',
+    physicalPath: 'images/inner/buttonInner@128w.png',
     url: innerButtonInner_128Png,
     identifier: 'innerButtonInner_128Png',
     artDirectionLabel: '',
@@ -182,7 +182,7 @@ const innerButtonInner: ResponsiveImage = [
     extension: 'png',
   },
   {
-    moduleFilePath: 'images/inner/buttonInner@16w.webp',
+    physicalPath: 'images/inner/buttonInner@16w.webp',
     url: innerButtonInner_16Webp,
     identifier: 'innerButtonInner_16Webp',
     artDirectionLabel: '',
@@ -191,7 +191,7 @@ const innerButtonInner: ResponsiveImage = [
     extension: 'webp',
   },
   {
-    moduleFilePath: 'images/inner/buttonInner@64w.webp',
+    physicalPath: 'images/inner/buttonInner@64w.webp',
     url: innerButtonInner_64Webp,
     identifier: 'innerButtonInner_64Webp',
     artDirectionLabel: '',
@@ -200,7 +200,7 @@ const innerButtonInner: ResponsiveImage = [
     extension: 'webp',
   },
   {
-    moduleFilePath: 'images/inner/buttonInner@128w.webp',
+    physicalPath: 'images/inner/buttonInner@128w.webp',
     url: innerButtonInner_128Webp,
     identifier: 'innerButtonInner_128Webp',
     artDirectionLabel: '',
