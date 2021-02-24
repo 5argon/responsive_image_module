@@ -20,7 +20,13 @@ An input to this script is a single folder which it recursively scans and genera
 
 ## Usage
 
-Required permissions are `--allow-read --allow-write --unstable`. If you use `deno install` on the `cli.ts`, then you could :
+Required permissions are `--allow-read --allow-write --unstable`. If you use `deno install` on the `cli.ts` like this : 
+
+```
+deno install --allow-read --allow-write --unstable https://deno.land/x/responsive_image_module/cli.ts
+```
+
+then you could :
 
 ```
 responsive_image_module generate [PATH TO INPUT FOLDER]
