@@ -1,4 +1,4 @@
-import { join, dirname, relative } from './deps.ts'
+import { join, dirname, relative, isAbsolute } from './deps.ts'
 import { ensureDir } from './deps.ts'
 import { camelCase } from './deps.ts'
 import { ImageVariation } from './interface.ts'
@@ -10,7 +10,7 @@ const interfaceFileName = '_responsive-image'
  * @param inputFolder This is recursively processed.
  * @param outputFolder This folder will be cleared out completely on each generation.
  * @param extensions Extensions of the original file to process.
- * Mirrors input folder but a module replaces each image.
+ * Mirrors input folder but inputFolderResolved module replaces each image.
  * @param artDirectionPattern Regex pattern that will be placed after the file name. Must contain 1 group. Captures art direction label string.
  * @param widthDescriptorPattern Regex pattern that will be placed after the art direction pattern. Must contain 1 group. Captures width descriptor number, therefore recommended to use `[0-9]+` in the group parentheses.
  * @param pixelDensityPattern Regex pattern that will be placed after the width descriptor pattern. Must contain 1 group. Captures pixel density number, therefore recommended to use `[0-9]+` in the group parentheses.
@@ -26,8 +26,9 @@ export async function generate(
   for (const e of extensions) {
     extensionCheck[e] = true
   }
+  const inputFolderResolved: string = relative('.', inputFolder)
   const regex = new RegExp(
-    `${inputFolder}(.*)${artDirectionPattern}${widthDescriptorPattern}${pixelDensityPattern}\.(.*)`
+    `${inputFolderResolved}(.*)${artDirectionPattern}${widthDescriptorPattern}${pixelDensityPattern}\.(.*)`
   )
 
   interface Collection {
@@ -103,9 +104,9 @@ export async function generate(
       }
     }
   }
-  const outputFolder = inputFolder + '-modules'
+  const outputFolder = inputFolderResolved + '-modules'
   await ensureDir(outputFolder)
-  const getFilePromise = getFiles(inputFolder)
+  const getFilePromise = getFiles(inputFolderResolved)
   const removePromise = Deno.remove(outputFolder, { recursive: true })
   await Promise.all([getFilePromise, removePromise])
   await ensureDir(outputFolder)
@@ -139,10 +140,12 @@ function fileContent(
   ivs: ImageVariation[],
   interfaceLocation: string
 ): string {
-  const typeImport = `import type { ResponsiveImage } from '${relative(
-    moduleFilePath,
-    interfaceLocation
-  )}'`
+  const toInterface = relative(dirname(moduleFilePath), interfaceLocation)
+  // `relative` produce "absolute" path in JS module sense if the location is the same,
+  // and would be magically interpreted to be node_modules. We need to add back the relativeness with ./
+  const typeImport = `import type { ResponsiveImage } from '${
+    toInterface.startsWith('../') ? toInterface : `./${toInterface}`
+  }'`
   ivs.sort((a, b) => {
     if (a.extension !== b.extension) {
       if (a.extension < b.extension) return -1

@@ -66,7 +66,7 @@ images-module
 `button.ts` module content :
 
 ```ts
-import type { ResponsiveImage } from '../_responsive-image'
+import type { ResponsiveImage } from './_responsive-image'
 
 import button_16Png from '../images/button@16w.png'
 import button_64Png from '../images/button@64w.png'
@@ -138,7 +138,7 @@ export default button
 `buttonInner.ts` module content (notice how relative path gets deeper as well) :
 
 ```ts
-import type { ResponsiveImage } from '../../_responsive-image'
+import type { ResponsiveImage } from '../_responsive-image'
 
 import innerButtonInner_16Png from '../../images/inner/buttonInner@16w.png'
 import innerButtonInner_64Png from '../../images/inner/buttonInner@64w.png'
