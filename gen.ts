@@ -1,34 +1,33 @@
-import * as p from 'https://deno.land/std@0.87.0/path/mod.ts'
-import { ensureDir } from 'https://deno.land/std@0.87.0/fs/mod.ts'
-
+import { join, dirname, relative } from './deps.ts'
+import { ensureDir } from './deps.ts'
+import { camelCase } from './deps.ts'
 import { ImageVariation } from './interface.ts'
+import { interfaceCopy } from './interface_copy.ts'
+
+const interfaceFileName = '_responsive-image'
 
 /**
  * @param inputFolder This is recursively processed.
  * @param outputFolder This folder will be cleared out completely on each generation.
- * Mirrors input folder but a module replaces each image.
- * @param suffixBefore It does not read image to determine width but trust the filename completely.
- * Width number must be in the file name after the original's file name. If the format is `example@512px.png` where
- * original file is `example.png`, "suffix before" is `@`.
- * @param suffixAfter It does not read image to determine width but trust the filename completely.
- * Width number must be in the file name after the original's file name. If the format is `example@512px.png` where
- * original file is `example.png`, "suffix after" is `px`.
  * @param extensions Extensions of the original file to process.
+ * Mirrors input folder but a module replaces each image.
+ * @param artDirectionPattern Regex pattern that will be placed after the file name. Must contain 1 group. Captures art direction label string.
+ * @param widthDescriptorPattern Regex pattern that will be placed after the art direction pattern. Must contain 1 group. Captures width descriptor number, therefore recommended to use `[0-9]+` in the group parentheses.
+ * @param pixelDensityPattern Regex pattern that will be placed after the width descriptor pattern. Must contain 1 group. Captures pixel density number, therefore recommended to use `[0-9]+` in the group parentheses.
  */
 export async function generate(
   inputFolder: string,
-  suffixBefore: string,
-  suffixAfter: string,
   extensions: string[],
-  typeImportSource: string,
-  relativeImport: boolean
+  artDirectionPattern: string,
+  widthDescriptorPattern: string,
+  pixelDensityPattern: string
 ) {
   const extensionCheck: { [k: string]: boolean } = {}
-  for (const e in extensions) {
+  for (const e of extensions) {
     extensionCheck[e] = true
   }
   const regex = new RegExp(
-    `${inputFolder}(.*)${suffixBefore}([0-9]+)${suffixAfter}\.(.*)`
+    `${inputFolder}(.*)${artDirectionPattern}${widthDescriptorPattern}${pixelDensityPattern}\.(.*)`
   )
 
   interface Collection {
@@ -43,9 +42,9 @@ export async function generate(
   const getFiles = async (path: string) => {
     for await (const dirEntry of Deno.readDir(path)) {
       if (dirEntry.isDirectory) {
-        await getFiles(p.join(path, dirEntry.name))
+        await getFiles(join(path, dirEntry.name))
       } else if (dirEntry.isFile) {
-        const joined = p.join(path, dirEntry.name)
+        const joined = join(path, dirEntry.name)
         const matchArray = joined.match(regex)
         if (
           matchArray !== null &&
@@ -54,18 +53,42 @@ export async function generate(
         ) {
           const modulePhysicalPath = `${matchArray[1]}`
           const physicalPath = matchArray[1]
-          const makeProgramSafeName = (input: string) =>
-            input
-              .replaceAll('/', '_')
-              .replaceAll(suffixBefore, '_')
-              .replaceAll(suffixAfter, '_')
-          const programSafeName = makeProgramSafeName(physicalPath)
+
+          function prefixEscape(input: string): string {
+            if (input.length === 0) {
+              return '_'
+            }
+            let c = input[0]
+            let inputMu: string = input
+            if (c === '/') {
+              inputMu = input.slice(1)
+            }
+            c = inputMu[0]
+            if (c >= '0' && c <= '9') {
+              const escaped = '_' + inputMu
+              return escaped
+            }
+            return inputMu
+          }
+
+          function makeProgramSafeName(input: string): string {
+            return prefixEscape(
+              camelCase(input.replaceAll('/', '_').replaceAll('-', '_'))
+            )
+          }
+
+          // TODO : Add pixel density and art direction to the identifier.
+          const programSafeIdentifier = makeProgramSafeName(
+            `${physicalPath}_${matchArray[2]}_${matchArray[3]}`
+          )
+
           const variation: ImageVariation = {
-            physicalPath: physicalPath,
-            identifier: `${programSafeName}`,
+            physicalPath: `${joined}`,
+            identifier: `${programSafeIdentifier}`,
             url: matchArray[0],
             extension: matchArray[3],
             pixelDensity: 1, // TODO
+            artDirectionLabel: '', // TODO
             widthDescriptor: parseInt(matchArray[2]),
           }
           if (modulePhysicalPath in collection === false) {
@@ -81,56 +104,83 @@ export async function generate(
     }
   }
   const outputFolder = inputFolder + '-modules'
+  await ensureDir(outputFolder)
   const getFilePromise = getFiles(inputFolder)
   const removePromise = Deno.remove(outputFolder, { recursive: true })
   await Promise.all([getFilePromise, removePromise])
   await ensureDir(outputFolder)
   const enc = new TextEncoder()
 
+  // A copy of interface that all image modules will import.
+  const interfaceLocation = outputFolder + '/' + interfaceFileName
+  Deno.writeFileSync(interfaceLocation + '.ts', enc.encode(interfaceCopy))
+
   async function doit(c: Collection): Promise<void> {
+    const outputPath = outputFolder + c.modulePhysicalPath
+    await ensureDir(dirname(outputPath))
+    const newFileLocation = `${outputPath}.ts`
+
     const content = fileContent(
-      c.modulePhysicalPath,
+      newFileLocation,
       c.moduleProgramSafeName,
       c.variations,
-      typeImportSource,
-      relativeImport
+      interfaceLocation
     )
     const encoded = enc.encode(content)
-    const outputPath = outputFolder + c.modulePhysicalPath
-    await ensureDir(outputPath)
-    await Deno.writeFile(outputPath, encoded)
-    console.log('Written : ' + outputPath)
+    await Deno.writeFile(newFileLocation, encoded)
+    console.log('Written : ' + newFileLocation)
   }
   await Promise.all(Object.values(collection).map((x) => doit(x)))
 }
 
 function fileContent(
-  physicalPath: string,
-  programSafeName: string,
+  moduleFilePath: string,
+  moduleExportName: string,
   ivs: ImageVariation[],
-  typeImportSource: string,
-  relativeImport: boolean
+  interfaceLocation: string
 ): string {
-  const depth = physicalPath.split('/').length - 1
-  const stepBacks = new Array(depth).fill('../').join('')
-  const typeImport = `import type { ResponsiveImage } from ${
-    relativeImport ? stepBacks : ''
-  }${typeImportSource}`
+  const typeImport = `import type { ResponsiveImage } from '${relative(
+    moduleFilePath,
+    interfaceLocation
+  )}'`
+  ivs.sort((a, b) => {
+    if (a.extension !== b.extension) {
+      if (a.extension < b.extension) return -1
+      if (a.extension > b.extension) return 1
+    }
+    if (a.widthDescriptor !== b.widthDescriptor) {
+      return a.widthDescriptor - b.widthDescriptor
+    }
+    if (a.pixelDensity !== b.pixelDensity) {
+      return a.pixelDensity - b.pixelDensity
+    }
+    if (a.artDirectionLabel !== b.artDirectionLabel) {
+      if (a.artDirectionLabel < b.artDirectionLabel) return -1
+      if (a.artDirectionLabel > b.artDirectionLabel) return 1
+    }
+    return 0
+  })
   const imports = ivs
     .map<string>((x) => {
-      return `import ${x.identifier} from '../${x.url}'`
+      return `import ${x.identifier} from '${relative(
+        dirname(moduleFilePath),
+        x.physicalPath
+      )}'`
     })
     .join('\n')
   const objExports = ivs.map<string>((x) => {
-    return `{ identifier: '${x.identifier}', url: ${x.identifier}, widthDescriptor: ${x.widthDescriptor}, pixelDensity: ${x.pixelDensity}, extension: '${x.extension}'}`
+    return `  { moduleFilePath:'${x.physicalPath}', 
+    url: ${x.identifier}, identifier: '${x.identifier}', 
+    artDirectionLabel: '${x.artDirectionLabel}', widthDescriptor: ${x.widthDescriptor}, pixelDensity: ${x.pixelDensity}, extension: '${x.extension}'}`
   })
-  const objExportsWrapped = `const ${programSafeName} : ResponsiveImage = [
-  [
-    ${objExports.join(',')}
-  ]
+  const objExportsWrapped = `const ${moduleExportName} : ResponsiveImage = [
+${objExports.join(',\n')}
 ]
-export default ${programSafeName}`
+
+export default ${moduleExportName}`
   return `${typeImport}
+
 ${imports}
+
 ${objExportsWrapped}`
 }

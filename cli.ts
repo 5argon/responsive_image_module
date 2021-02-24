@@ -4,16 +4,19 @@ import { generate } from './gen.ts'
 if (import.meta.main) {
   const flags: FlagsArgs = parseFlags(Deno.args)
   const args: (string | number)[] = flags._
-  if (args.length !== 2) {
+  if (args.length < 2 || args[0] !== 'generate') {
     throw new Error(
-      'Must specify exactly one input folder, and one output folder.'
+      'Must specify "generate" command and exactly one input folder.'
     )
   }
-  const input = args[0]
-  const output = args[1]
-  if (typeof input !== 'string' || typeof output !== 'string') {
-    throw new Error('Input and output folder must be string.')
+  let input = args[1]
+  if (typeof input !== 'string') {
+    throw new Error('Input folder must be string.')
   }
-  generate(input, '@', 'w', ['png', 'jpg', 'webp'], 'interface.ts', true)
-  console.log('Completed.')
+  if (input[input.length - 1] === '/') {
+    input = input.slice(0, input.length - 1)
+  }
+  // TODO: Not hard-code these and allow using command line to specify.
+  await generate(input, ['png', 'jpg', 'jpeg', 'webp'], '', '@([0-9]+)w', '')
+  console.log('Completed generating image modules.')
 }

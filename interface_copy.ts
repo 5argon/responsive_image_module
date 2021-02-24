@@ -1,3 +1,4 @@
+export const interfaceCopy = `
 /**
  * "One" responsive image consists of multiple variations which are different files.
  */
@@ -43,3 +44,4 @@ export interface ImageVariation {
    */
   extension: string
 }
+`
