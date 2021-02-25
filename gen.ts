@@ -143,7 +143,7 @@ function fileContent(
   const toInterface = relative(dirname(moduleFilePath), interfaceLocation)
   // `relative` produce "absolute" path in JS module sense if the location is the same,
   // and would be magically interpreted to be node_modules. We need to add back the relativeness with ./
-  const typeImport = `import type { ResponsiveImage } from '${
+  const typeImport = `import type { ResponsiveImage, ImageVariation } from '${
     toInterface.startsWith('../') ? toInterface : `./${toInterface}`
   }'`
   ivs.sort((a, b) => {
@@ -165,25 +165,36 @@ function fileContent(
   })
   const imports = ivs
     .map<string>((x) => {
-      return `import ${x.identifier} from '${relative(
+      return `import ${x.identifier}_import from '${relative(
         dirname(moduleFilePath),
         x.physicalPath
       )}'`
     })
     .join('\n')
-  const objExports = ivs.map<string>((x) => {
-    return `  { physicalPath:'${x.physicalPath}', 
-    url: ${x.identifier}, identifier: '${x.identifier}', 
-    artDirectionLabel: '${x.artDirectionLabel}', widthDescriptor: ${x.widthDescriptor}, pixelDensity: ${x.pixelDensity}, extension: '${x.extension}'}`
+
+  const objExports = ivs
+    .map<string>((x) => {
+      return `export const ${x.identifier} : ImageVariation = { 
+    physicalPath:'${x.physicalPath}', url: ${x.identifier}_import, identifier: '${x.identifier}', 
+    artDirectionLabel: '${x.artDirectionLabel}', widthDescriptor: ${x.widthDescriptor}, pixelDensity: ${x.pixelDensity}, extension: '${x.extension}'
+}`
+    })
+    .join('\n')
+
+  const objExportsWrapped = `export const ${moduleExportName} : ResponsiveImage = [
+${ivs
+  .map<string>((x) => {
+    return `  ${x.identifier}`
   })
-  const objExportsWrapped = `const ${moduleExportName} : ResponsiveImage = [
-${objExports.join(',\n')}
+  .join(',\n')}
 ]
 
 export default ${moduleExportName}`
   return `${typeImport}
 
 ${imports}
+
+${objExports}
 
 ${objExportsWrapped}`
 }

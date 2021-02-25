@@ -62,13 +62,13 @@ Input an `images` folder path with content like this :
 ```
 images
 |- inner
-|  |- buttonInner.png
-|  |- buttonInner@16w.png
-|  |- buttonInner@16w.webp
-|  |- buttonInner@64w.png
-|  |- buttonInner@64w.webp
-|  |- buttonInner@128w.png
-|  +- buttonInner@128w.webp
+|  |- button.png
+|  |- button@16w.png
+|  |- button@16w.webp
+|  |- button@64w.png
+|  |- button@64w.webp
+|  |- button@128w.png
+|  +- button@128w.webp
 |- button.png
 |- button@16w.png
 |- button@16w.webp
@@ -93,70 +93,47 @@ images-module
 `button.ts` module content :
 
 ```ts
-import type { ResponsiveImage } from './_responsive-image'
+import type { ResponsiveImage, ImageVariation } from './_responsive-image'
 
-import button_16Png from '../images/button@16w.png'
-import button_64Png from '../images/button@64w.png'
-import button_128Png from '../images/button@128w.png'
-import button_16Webp from '../images/button@16w.webp'
-import button_64Webp from '../images/button@64w.webp'
-import button_128Webp from '../images/button@128w.webp'
+import button_16Png_import from '../images/button@16w.png'
+import button_64Png_import from '../images/button@64w.png'
+import button_128Png_import from '../images/button@128w.png'
+import button_16Webp_import from '../images/button@16w.webp'
+import button_64Webp_import from '../images/button@64w.webp'
+import button_128Webp_import from '../images/button@128w.webp'
 
-const button: ResponsiveImage = [
-  {
-    physicalPath: 'images/button@16w.png',
-    url: button_16Png,
-    identifier: 'button_16Png',
-    artDirectionLabel: '',
-    widthDescriptor: 16,
-    pixelDensity: 1,
-    extension: 'png',
-  },
-  {
-    physicalPath: 'images/button@64w.png',
-    url: button_64Png,
-    identifier: 'button_64Png',
-    artDirectionLabel: '',
-    widthDescriptor: 64,
-    pixelDensity: 1,
-    extension: 'png',
-  },
-  {
-    physicalPath: 'images/button@128w.png',
-    url: button_128Png,
-    identifier: 'button_128Png',
-    artDirectionLabel: '',
-    widthDescriptor: 128,
-    pixelDensity: 1,
-    extension: 'png',
-  },
-  {
-    physicalPath: 'images/button@16w.webp',
-    url: button_16Webp,
-    identifier: 'button_16Webp',
-    artDirectionLabel: '',
-    widthDescriptor: 16,
-    pixelDensity: 1,
-    extension: 'webp',
-  },
-  {
-    physicalPath: 'images/button@64w.webp',
-    url: button_64Webp,
-    identifier: 'button_64Webp',
-    artDirectionLabel: '',
-    widthDescriptor: 64,
-    pixelDensity: 1,
-    extension: 'webp',
-  },
-  {
-    physicalPath: 'images/button@128w.webp',
-    url: button_128Webp,
-    identifier: 'button_128Webp',
-    artDirectionLabel: '',
-    widthDescriptor: 128,
-    pixelDensity: 1,
-    extension: 'webp',
-  },
+export const button_16Png : ImageVariation = { 
+    physicalPath:'images/button@16w.png', url: button_16Png_import, identifier: 'button_16Png', 
+    artDirectionLabel: '', widthDescriptor: 16, pixelDensity: 1, extension: 'png'
+}
+export const button_64Png : ImageVariation = { 
+    physicalPath:'images/button@64w.png', url: button_64Png_import, identifier: 'button_64Png', 
+    artDirectionLabel: '', widthDescriptor: 64, pixelDensity: 1, extension: 'png'
+}
+export const button_128Png : ImageVariation = { 
+    physicalPath:'images/button@128w.png', url: button_128Png_import, identifier: 'button_128Png', 
+    artDirectionLabel: '', widthDescriptor: 128, pixelDensity: 1, extension: 'png'
+}
+export const button_16Webp : ImageVariation = { 
+    physicalPath:'images/button@16w.webp', url: button_16Webp_import, identifier: 'button_16Webp', 
+    artDirectionLabel: '', widthDescriptor: 16, pixelDensity: 1, extension: 'webp'
+}
+export const button_64Webp : ImageVariation = { 
+    physicalPath:'images/button@64w.webp', url: button_64Webp_import, identifier: 'button_64Webp', 
+    artDirectionLabel: '', widthDescriptor: 64, pixelDensity: 1, extension: 'webp'
+}
+export const button_128Webp : ImageVariation = { 
+    physicalPath:'images/button@128w.webp', url: button_128Webp_import, identifier: 'button_128Webp', 
+    artDirectionLabel: '', widthDescriptor: 128, pixelDensity: 1, extension: 'webp'
+}
+
+export const button : ResponsiveImage = [
+  button_16Png,
+  button_64Png,
+  button_128Png,
+  button_16Webp,
+  button_64Webp,
+  button_128Webp
 ]
 
 export default button
@@ -165,73 +142,50 @@ export default button
 `buttonInner.ts` module content (notice how relative path gets deeper as well) :
 
 ```ts
-import type { ResponsiveImage } from '../_responsive-image'
+import type { ResponsiveImage, ImageVariation } from '../_responsive-image'
 
-import innerButtonInner_16Png from '../../images/inner/buttonInner@16w.png'
-import innerButtonInner_64Png from '../../images/inner/buttonInner@64w.png'
-import innerButtonInner_128Png from '../../images/inner/buttonInner@128w.png'
-import innerButtonInner_16Webp from '../../images/inner/buttonInner@16w.webp'
-import innerButtonInner_64Webp from '../../images/inner/buttonInner@64w.webp'
-import innerButtonInner_128Webp from '../../images/inner/buttonInner@128w.webp'
+import innerButton_16Png_import from '../../images/inner/button@16w.png'
+import innerButton_64Png_import from '../../images/inner/button@64w.png'
+import innerButton_128Png_import from '../../images/inner/button@128w.png'
+import innerButton_16Webp_import from '../../images/inner/button@16w.webp'
+import innerButton_64Webp_import from '../../images/inner/button@64w.webp'
+import innerButton_128Webp_import from '../../images/inner/button@128w.webp'
 
-const innerButtonInner: ResponsiveImage = [
-  {
-    physicalPath: 'images/inner/buttonInner@16w.png',
-    url: innerButtonInner_16Png,
-    identifier: 'innerButtonInner_16Png',
-    artDirectionLabel: '',
-    widthDescriptor: 16,
-    pixelDensity: 1,
-    extension: 'png',
-  },
-  {
-    physicalPath: 'images/inner/buttonInner@64w.png',
-    url: innerButtonInner_64Png,
-    identifier: 'innerButtonInner_64Png',
-    artDirectionLabel: '',
-    widthDescriptor: 64,
-    pixelDensity: 1,
-    extension: 'png',
-  },
-  {
-    physicalPath: 'images/inner/buttonInner@128w.png',
-    url: innerButtonInner_128Png,
-    identifier: 'innerButtonInner_128Png',
-    artDirectionLabel: '',
-    widthDescriptor: 128,
-    pixelDensity: 1,
-    extension: 'png',
-  },
-  {
-    physicalPath: 'images/inner/buttonInner@16w.webp',
-    url: innerButtonInner_16Webp,
-    identifier: 'innerButtonInner_16Webp',
-    artDirectionLabel: '',
-    widthDescriptor: 16,
-    pixelDensity: 1,
-    extension: 'webp',
-  },
-  {
-    physicalPath: 'images/inner/buttonInner@64w.webp',
-    url: innerButtonInner_64Webp,
-    identifier: 'innerButtonInner_64Webp',
-    artDirectionLabel: '',
-    widthDescriptor: 64,
-    pixelDensity: 1,
-    extension: 'webp',
-  },
-  {
-    physicalPath: 'images/inner/buttonInner@128w.webp',
-    url: innerButtonInner_128Webp,
-    identifier: 'innerButtonInner_128Webp',
-    artDirectionLabel: '',
-    widthDescriptor: 128,
-    pixelDensity: 1,
-    extension: 'webp',
-  },
+export const innerButton_16Png : ImageVariation = { 
+    physicalPath:'images/inner/button@16w.png', url: innerButton_16Png_import, identifier: 'innerButton_16Png', 
+    artDirectionLabel: '', widthDescriptor: 16, pixelDensity: 1, extension: 'png'
+}
+export const innerButton_64Png : ImageVariation = { 
+    physicalPath:'images/inner/button@64w.png', url: innerButton_64Png_import, identifier: 'innerButton_64Png', 
+    artDirectionLabel: '', widthDescriptor: 64, pixelDensity: 1, extension: 'png'
+}
+export const innerButton_128Png : ImageVariation = { 
+    physicalPath:'images/inner/button@128w.png', url: innerButton_128Png_import, identifier: 'innerButton_128Png', 
+    artDirectionLabel: '', widthDescriptor: 128, pixelDensity: 1, extension: 'png'
+}
+export const innerButton_16Webp : ImageVariation = { 
+    physicalPath:'images/inner/button@16w.webp', url: innerButton_16Webp_import, identifier: 'innerButton_16Webp', 
+    artDirectionLabel: '', widthDescriptor: 16, pixelDensity: 1, extension: 'webp'
+}
+export const innerButton_64Webp : ImageVariation = { 
+    physicalPath:'images/inner/button@64w.webp', url: innerButton_64Webp_import, identifier: 'innerButton_64Webp', 
+    artDirectionLabel: '', widthDescriptor: 64, pixelDensity: 1, extension: 'webp'
+}
+export const innerButton_128Webp : ImageVariation = { 
+    physicalPath:'images/inner/button@128w.webp', url: innerButton_128Webp_import, identifier: 'innerButton_128Webp', 
+    artDirectionLabel: '', widthDescriptor: 128, pixelDensity: 1, extension: 'webp'
+}
+
+export const innerButton : ResponsiveImage = [
+  innerButton_16Png,
+  innerButton_64Png,
+  innerButton_128Png,
+  innerButton_16Webp,
+  innerButton_64Webp,
+  innerButton_128Webp
 ]
 
-export default innerButtonInner
+export default innerButton
 ```
 
-Then you can use the `default` export of each responsive image and use any individual image in the array. Though the module contains all variations, sufficiently advanced tree-shaking will only bundle the image that you accessed on `url` key since that links to the real imported image.
+It provide a `default` export and one named export (named after folder traveling to the image, then the image's name) to represent all the variations as an array. Also you can use other named export representing each variation as well. They are named by appending variation differences to the base name.
